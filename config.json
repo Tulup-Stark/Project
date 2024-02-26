@@ -1,0 +1,4 @@
+{
+  "files": ["document1.txt", "document2.txt", "document3.txt"],
+  "max_results": 10
+}
