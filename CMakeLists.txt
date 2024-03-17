@@ -1,57 +1,21 @@
-# 'Google_test' is the subproject name
+cmake_minimum_required (VERSION 3.0)
 
-project(Google_tests)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-# copy configuration and requests files into build directory
-if (WIN32)
-    configure_file(../config_win.json config.json COPYONLY)
-else()
-    configure_file(../config_lin.json config.json COPYONLY) #unix
-endif(WIN32)
-configure_file(../requests.json requests.json COPYONLY)
-configure_file(../libstdc++-6.dll libstdc++-6.dll COPYONLY)
-# creating database directory for files to be indexed
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/database)
-
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-
-include(FetchContent)
-
-FetchContent_Declare(
-        googletest
-        URL
-        https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+set(SrcFiles
+	${MY_SRC_DIR}/InvertedIndex.cpp
+	${MY_SRC_DIR}/SearchEngine.cpp
+	${MY_SRC_DIR}/ConverterJSON.cpp
 )
 
-FetchContent_Declare(json
-        GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
-        GIT_TAG v3.11.2
-        )
-
-include_directories(
-        ${gtest_SOURCE_DIR}/include
-        ${gtest_SOURCE_DIR}
-        ${INCLUDE_DIR}
+set(TestsFiles
+	InvertedIndex_test.cpp
+	SearchEngine_test.cpp
+	ConverterJSON_test.cpp
 )
 
-set(gtest_disable_pthreads on)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest json)
-enable_testing()
-
-
-
-# 'Google_Tests_run' is the target name
-add_executable(Google_Tests_run
-        ${INCLUDE_DIR}/converterjson.h ${SOURCE_DIR}/converterjson.cpp
-        ${INCLUDE_DIR}/invertedindex.h ${SOURCE_DIR}/invertedindex.cpp
-        ${INCLUDE_DIR}/entry.h
-        ${INCLUDE_DIR}/searchserver.h ${SOURCE_DIR}/searchserver.cpp
-        ${INCLUDE_DIR}/relativeindex.h
-        invertedindextests.cpp searchservertests.cpp
-        )
-
+add_executable(GtestTests ${TestsFiles} ${SrcFiles})
+target_link_libraries(GtestTests nlohmann_json::nlohmann_json GTest::gtest_main)
 include(GoogleTest)
-gtest_discover_tests(Google_Tests_run)
-
-target_link_libraries(Google_Tests_run PUBLIC gtest gtest_main nlohmann_json::nlohmann_json)
+target_include_directories(GtestTests PUBLIC ${MY_INCLUDE_DIR})
+gtest_discover_tests(GtestTests)
