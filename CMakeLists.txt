@@ -1,21 +1,29 @@
-cmake_minimum_required (VERSION 3.0)
+if (WIN32)
+    cmake_minimum_required(VERSION 3.23)
+else ()
+    cmake_minimum_required(VERSION 3.22) #unix
+endif (WIN32)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+project(search_engine VERSION 0.2)
 
-set(SrcFiles
-	${MY_SRC_DIR}/InvertedIndex.cpp
-	${MY_SRC_DIR}/SearchEngine.cpp
-	${MY_SRC_DIR}/ConverterJSON.cpp
-)
+set(CMAKE_CXX_STANDARD 17)
 
-set(TestsFiles
-	InvertedIndex_test.cpp
-	SearchEngine_test.cpp
-	ConverterJSON_test.cpp
-)
+include(FetchContent)
 
-add_executable(GtestTests ${TestsFiles} ${SrcFiles})
-target_link_libraries(GtestTests nlohmann_json::nlohmann_json GTest::gtest_main)
-include(GoogleTest)
-target_include_directories(GtestTests PUBLIC ${MY_INCLUDE_DIR})
-gtest_discover_tests(GtestTests)
+FetchContent_Declare(json
+        GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
+        GIT_TAG v3.11.2
+        )
+
+FetchContent_MakeAvailable(json)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+
+#add_subdirectory(nlohmann_json)
+add_subdirectory(src)
+add_subdirectory(tests)
+
+target_link_libraries(search_engine PRIVATE nlohmann_json::nlohmann_json)
