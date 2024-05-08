@@ -1,13 +1,14 @@
 project(Google_tests)
 
+# copy configuration and requests files into build directory
 if (WIN32)
     configure_file(../config_win.json config.json COPYONLY)
 else()
-    configure_file(../config_lin.json config.json COPYONLY) 
+    configure_file(../config_lin.json config.json COPYONLY) #unix
 endif(WIN32)
 configure_file(../requests.json requests.json COPYONLY)
 configure_file(../libstdc++-6.dll libstdc++-6.dll COPYONLY)
-
+# creating database directory for files to be indexed
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/database)
 
 set(JSON_BuildTests OFF CACHE INTERNAL "")
@@ -38,6 +39,7 @@ enable_testing()
 
 
 
+# 'Google_Tests_run' is the target name
 add_executable(Google_Tests_run
         ${INCLUDE_DIR}/converterjson.h ${SOURCE_DIR}/converterjson.cpp
         ${INCLUDE_DIR}/invertedindex.h ${SOURCE_DIR}/invertedindex.cpp
