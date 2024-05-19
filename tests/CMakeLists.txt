@@ -1,5 +1,3 @@
-
-
 project(Google_tests)
 
 
@@ -47,7 +45,7 @@ add_executable(Google_Tests_run
         ${INCLUDE_DIR}/entry.h
         ${INCLUDE_DIR}/searchserver.h ${SOURCE_DIR}/searchserver.cpp
         ${INCLUDE_DIR}/relativeindex.h
-        InvertedIndex_test.cpp SearchEngine_test.cpp
+        invertedindextests.cpp searchservertests.cpp
         )
 
 include(GoogleTest)
