@@ -6,28 +6,13 @@
 #include <mutex>
 #include <thread>
 
-// #define DEBUG_CONSTRUCTOR
-//#define DEBUG_DBINDEX
-	/**
-	 * Constructor
-	 * */
 	InvertedIndex::InvertedIndex (ConverterJSON &js) : _json(js) {}
-
-	/**
-	* Обновить или заполнить базу документов, по которой будем совершать
-	поиск
-	* @param texts_input содержимое документов
-	*/
 	void InvertedIndex::updateDocumentBase(std::vector<std::string> input_docs){
-	//clear database before indexation
 	docs.clear();
 	docs = input_docs;
 }
 
 	std::mutex indexAccess;
-	/**
-	 Perform single file indexation
-	 */
 	void InvertedIndex::updateIndexFile(size_t fileNum){
 	std::string word;
 	std::stringstream stream(docs[fileNum]);
@@ -36,7 +21,7 @@
 		bool done = false;
 		if (word == "")
 			continue;
-		if (index.find(word) == index.end()){//no instance of word yet in the index
+		if (index.find(word) == index.end()){
 			std::vector<Entry> temp{{fileNum,1}};
 			indexAccess.lock();
 				index.emplace(word,temp);
@@ -63,9 +48,6 @@
 	}
 }
 
-	/**
-	 Perform database indexation
-	 * */
 	void InvertedIndex::updateIndexDB() {
 		auto start = std::chrono::high_resolution_clock::now();
 		this->updateDocumentBase(_json.getTextDocuments());
@@ -98,10 +80,6 @@
 #endif
 }
 
-	/**
-	 * monitor flag needUpdate and re-index database when commanded
-	 * @param needUpdate
-	 */
 	void InvertedIndex::periodicIndexing(bool const &needUpdate, bool &indexComplete){
 		while (true) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
@@ -114,12 +92,6 @@
 		}
 	}
 
-	/**
-	* Метод определяет количество вхождений слова word в загруженной базе
-	документов
-	* @param word слово, частоту вхождений которого необходимо определить
-	* @return возвращает подготовленный список с частотой слов
-	*/
 	std::vector<Entry> InvertedIndex::getWordCount(const std::string& word){
 		//std::vector<Entry> result;
 		return this->index[word];
